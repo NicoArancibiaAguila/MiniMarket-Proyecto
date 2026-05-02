@@ -56,7 +56,7 @@ public class AuthService {
     // METODO DE REGISTRO
     public UsuarioResponseDTO registrar(RegistroRequestDTO request){
 
-        if (usuarioRepository.existByRut(request.getRut())) {
+        if (usuarioRepository.existsByRut(request.getRut())) {
             throw new RuntimeException("Error: Ya existe un empleado registardo con este RUT");
         }
 
