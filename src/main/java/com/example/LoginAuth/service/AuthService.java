@@ -5,8 +5,11 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.LoginAuth.dto.LoginRequestDTO;
+import com.example.LoginAuth.dto.RegistroRequestDTO;
 import com.example.LoginAuth.dto.UsuarioResponseDTO;
+import com.example.LoginAuth.model.Rol;
 import com.example.LoginAuth.model.Usuario;
+import com.example.LoginAuth.repository.RolRepository;
 import com.example.LoginAuth.repository.UsuarioRepository;
 
 @Service
@@ -15,12 +18,14 @@ public class AuthService {
 
     
     private final UsuarioRepository usuarioRepository;                //traer al repo, en vez de final se puede usar un @AutoWired y se elimina el constructor
+    private final RolRepository rolRepository;
 
-    public AuthService(UsuarioRepository usuarioRepository){          //inyeccion de dependencias
+    public AuthService(UsuarioRepository usuarioRepository, RolRepository rolRepository){          //inyeccion de dependencias
         this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
     }
 
-    //logica negocio
+    // METODO DE LOGIN
     public UsuarioResponseDTO login(LoginRequestDTO request){
 
         //buscar si existe el username
@@ -46,6 +51,40 @@ public class AuthService {
             usuario.getRol().getNombreRol()
         );
 
+    }
+
+    // METODO DE REGISTRO
+    public UsuarioResponseDTO registrar(RegistroRequestDTO request){
+
+        if (usuarioRepository.existByRut(request.getRut())) {
+            throw new RuntimeException("Error: Ya existe un empleado registardo con este RUT");
+        }
+
+        if (usuarioRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Error: El nombre de usuario ya está en uso");
+        }
+
+        // aqui se busca que el rol exista en la bd 
+        Rol rolAsignado = rolRepository.findByNombreRol(request.getNombreRol())
+            .orElseThrow(() -> new RuntimeException("Error: El rol especificado no existe"));
+
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setNombre(request.getNombre());
+        nuevoUsuario.setRut(request.getRut());
+        nuevoUsuario.setUsername(request.getUsername());
+
+        nuevoUsuario.setPassword(request.getPassword());
+        nuevoUsuario.setRol(rolAsignado);
+
+        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
+
+        return new UsuarioResponseDTO(
+            usuarioGuardado.getId(),
+            usuarioGuardado.getNombre(),
+            usuarioGuardado.getRut(),
+            usuarioGuardado.getUsername(),
+            usuarioGuardado.getRol().getNombreRol()
+        );
     }
 
 }
