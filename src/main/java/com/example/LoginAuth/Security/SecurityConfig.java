@@ -28,7 +28,6 @@ public class SecurityConfig {
                 //aquie pasa quien empieza con "/api/auth/" sin preguntar nada
                 .requestMatchers("/api/auth/**").permitAll()
                 //aca si exige ser identificado por cualquier otra ruta
-                .requestMatchers("/api/auth").permitAll()
                 .anyRequest().authenticated()
             );
 
