@@ -1,16 +1,16 @@
-package com.example.LoginAuth.service;
+package com.example.loginauth.service;
 
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
-import com.example.LoginAuth.dto.LoginRequestDTO;
-import com.example.LoginAuth.dto.RegistroRequestDTO;
-import com.example.LoginAuth.dto.UsuarioResponseDTO;
-import com.example.LoginAuth.model.Rol;
-import com.example.LoginAuth.model.Usuario;
-import com.example.LoginAuth.repository.RolRepository;
-import com.example.LoginAuth.repository.UsuarioRepository;
+import com.example.loginauth.dto.LoginRequestDTO;
+import com.example.loginauth.dto.RegistroRequestDTO;
+import com.example.loginauth.dto.UsuarioResponseDTO;
+import com.example.loginauth.model.Rol;
+import com.example.loginauth.model.Usuario;
+import com.example.loginauth.repository.RolRepository;
+import com.example.loginauth.repository.UsuarioRepository;
 
 @Service
 public class AuthService {

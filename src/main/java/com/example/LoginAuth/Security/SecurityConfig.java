@@ -1,4 +1,4 @@
-package com.example.LoginAuth.Security;
+package com.example.loginauth.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +28,7 @@ public class SecurityConfig {
                 //aquie pasa quien empieza con "/api/auth/" sin preguntar nada
                 .requestMatchers("/api/auth/**").permitAll()
                 //aca si exige ser identificado por cualquier otra ruta
+                .requestMatchers("/api/auth").permitAll()
                 .anyRequest().authenticated()
             );
 

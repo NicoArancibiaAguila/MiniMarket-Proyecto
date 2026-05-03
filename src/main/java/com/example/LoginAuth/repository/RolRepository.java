@@ -1,4 +1,4 @@
-package com.example.LoginAuth.repository;
+package com.example.loginauth.repository;
 
 
 import java.util.Optional;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.LoginAuth.model.Rol;
+import com.example.loginauth.model.Rol;
 
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Long>{

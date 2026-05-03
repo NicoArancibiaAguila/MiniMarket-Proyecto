@@ -1,16 +1,16 @@
-package com.example.LoginAuth.controller;
+package com.example.loginauth.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LoginAuth.dto.LoginRequestDTO;
-import com.example.LoginAuth.dto.RegistroRequestDTO;
-import com.example.LoginAuth.dto.UsuarioResponseDTO;
-import com.example.LoginAuth.service.AuthService;
+import com.example.loginauth.dto.LoginRequestDTO;
+import com.example.loginauth.dto.RegistroRequestDTO;
+import com.example.loginauth.dto.UsuarioResponseDTO;
+import com.example.loginauth.service.AuthService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 
 @RestController

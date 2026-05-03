@@ -1,4 +1,4 @@
-package com.example.LoginAuth.dto;
+package com.example.loginauth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

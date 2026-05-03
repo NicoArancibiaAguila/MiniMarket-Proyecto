@@ -1,4 +1,4 @@
-package com.example.LoginAuth.model;
+package com.example.loginauth.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
