@@ -3,6 +3,7 @@ package com.example.loginauth.service;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.loginauth.dto.LoginRequestDTO;
 import com.example.loginauth.dto.RegistroRequestDTO;
@@ -11,6 +12,7 @@ import com.example.loginauth.model.Rol;
 import com.example.loginauth.model.Usuario;
 import com.example.loginauth.repository.RolRepository;
 import com.example.loginauth.repository.UsuarioRepository;
+import com.example.loginauth.security.jwt.JwtUtil;
 
 @Service
 public class AuthService {
@@ -19,10 +21,15 @@ public class AuthService {
     
     private final UsuarioRepository usuarioRepository;                //traer al repo, en vez de final se puede usar un @AutoWired y se elimina el constructor
     private final RolRepository rolRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(UsuarioRepository usuarioRepository, RolRepository rolRepository){          //inyeccion de dependencias
+
+    public AuthService(UsuarioRepository usuarioRepository, RolRepository rolRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil){          //inyeccion de dependencias
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     // METODO DE LOGIN
@@ -38,19 +45,23 @@ public class AuthService {
         Usuario usuario = usuarioOpt.get();
 
         //comparacion de contraseñas
-        if (!usuario.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
             throw new RuntimeException("Error: Usuario o contraseña incorrectos");
         }
 
-        //si todo pasa y esta bien, se retorna
-        return new UsuarioResponseDTO(
-            usuario.getId(),
-            usuario.getNombre(),
-            usuario.getRut(),
-            usuario.getUsername(),
-            usuario.getRol().getNombreRol()
-        );
+        //se genera el token
+        String tokenGenerado = jwtUtil.generateToken(usuario.getUsername(), usuario.getRol().getNombreRol());
 
+        //si todo pasa y esta bien, se retorna
+        UsuarioResponseDTO response = new UsuarioResponseDTO();
+        response.setId(usuario.getId());
+        response.setNombre(usuario.getNombre());
+        response.setRut(usuario.getRut());
+        response.setUsername(usuario.getUsername());
+        response.setNombreRol(usuario.getRol().getNombreRol());
+        response.setToken(tokenGenerado);
+
+        return response;
     }
 
     // METODO DE REGISTRO
@@ -73,18 +84,21 @@ public class AuthService {
         nuevoUsuario.setRut(request.getRut());
         nuevoUsuario.setUsername(request.getUsername());
 
-        nuevoUsuario.setPassword(request.getPassword());
+        //aca se encripta la clave antes de guardarla en bd
+        nuevoUsuario.setPassword(passwordEncoder.encode(request.getPassword())); 
         nuevoUsuario.setRol(rolAsignado);
 
         Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
 
-        return new UsuarioResponseDTO(
-            usuarioGuardado.getId(),
-            usuarioGuardado.getNombre(),
-            usuarioGuardado.getRut(),
-            usuarioGuardado.getUsername(),
-            usuarioGuardado.getRol().getNombreRol()
-        );
+        //aca se registra el token va nulo, debe logearse para obtenerlo
+        UsuarioResponseDTO response = new UsuarioResponseDTO();
+        response.setId(usuarioGuardado.getId());
+        response.setNombre(usuarioGuardado.getNombre());
+        response.setRut(usuarioGuardado.getRut());
+        response.setUsername(usuarioGuardado.getUsername());
+        response.setNombreRol(usuarioGuardado.getRol().getNombreRol());
+        
+        return response;
     }
 
 }
