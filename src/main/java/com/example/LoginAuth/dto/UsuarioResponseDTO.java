@@ -14,4 +14,5 @@ public class UsuarioResponseDTO {
     private String rut;
     private String username;
     private String nombreRol;
+    private String token;
 }
