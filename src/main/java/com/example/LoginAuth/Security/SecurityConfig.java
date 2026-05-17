@@ -1,5 +1,6 @@
 package com.example.loginauth.security;
 
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,14 +13,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    // El constructor inyecta ambos servicios
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService userDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -27,11 +32,11 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable()) // Deshabilitamos CSRF para APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Permitimos login y registro sin token
-                .anyRequest().authenticated() // Todo lo demás requiere token
+                .requestMatchers("/api/auth/**").permitAll() // Permitimos login sin token
+                .anyRequest().authenticated() // Lo demás requiere token
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin estado (usamos JWT)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin estado
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
@@ -39,7 +44,16 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Este es el motor de encriptación
+        return new BCryptPasswordEncoder();
+    }
+
+    // ¡AQUÍ ES DONDE SE USA LA VARIABLE Y DESAPARECE EL ERROR AMARILLO!
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService); 
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
     @Bean
