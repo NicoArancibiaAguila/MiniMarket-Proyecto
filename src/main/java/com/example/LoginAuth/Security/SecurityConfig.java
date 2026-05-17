@@ -2,44 +2,48 @@ package com.example.loginauth.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Configuration    //clase de configuracion, como para registrar "herramientas" que otros componentes como AuthService usen mas adelante
-@EnableWebSecurity   //Interruptor, practicamente le dice a Spring "desactiva la seguridad y activa config personalizada que voy a escribir en esta clase"
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig {
-    
-    //Bean en le dice a Spring "ejecuta este metodo y guarda el objeto q retorna en tu memoria"
-    @Bean
-    //este metodo define el filtro por el que debe pasar cada peticion HTTP que llegue a puerto 8081
-    // con HttpSecurity http como objeto que arma las reglas de seguridad
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http
-            //desactiva el Cross-Site Request Forgery - proteccion para formularios HTML clasicos
-            .csrf(csrf -> csrf.disable())
-            //se configura la sesion como STATELESS (sin estado)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            //aqui se define quien pasa y quien no
-            .authorizeHttpRequests(auth -> auth          
-                //aquie pasa quien empieza con "/api/auth/" sin preguntar nada
-                .requestMatchers("/api/auth/**").permitAll()
-                //aca si exige ser identificado por cualquier otra ruta
-                .anyRequest().authenticated()
-            );
 
-        // cierre de configuracion y se entrega el objeto terminado
-        return http.build();
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    //encripta contraseña
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable()) // Deshabilitamos CSRF para APIs
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll() // Permitimos login y registro sin token
+                .anyRequest().authenticated() // Todo lo demás requiere token
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin estado (usamos JWT)
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Este es el motor de encriptación
+    }
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }
