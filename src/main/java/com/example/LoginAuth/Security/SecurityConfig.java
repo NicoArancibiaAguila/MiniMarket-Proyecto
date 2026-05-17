@@ -47,12 +47,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ¡AQUÍ ES DONDE SE USA LA VARIABLE Y DESAPARECE EL ERROR AMARILLO!
-    @Bean
+@Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService); 
+        // recibir el usuario, buscar en la bd y compararlo
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+        
         return authProvider;
     }
 
