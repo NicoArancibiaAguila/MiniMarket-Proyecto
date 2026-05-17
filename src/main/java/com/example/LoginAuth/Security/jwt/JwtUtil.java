@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
     
-    // IMPORTANTE: Esta clave debe tener al menos 32 caracteres para HS256
+    // IMPORTANTE: Esta clave debe ser larga
     private final String SECRET_STRING = "clave_secreta_super_segura_de_32_caracteres_minimo";
     private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
 
@@ -29,12 +29,10 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256) // Cambiado aquí
                 .compact();
     }
-
-    // --- NUEVOS MÉTODOS PARA QUE EL FILTRO NO DE ERROR ---
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -46,7 +44,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parserBuilder() // Cambiado aquí (parserBuilder)
                 .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
