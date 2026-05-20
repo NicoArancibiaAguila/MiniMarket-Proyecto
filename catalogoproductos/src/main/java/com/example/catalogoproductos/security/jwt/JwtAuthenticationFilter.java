@@ -42,8 +42,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // aca se extra  el rol del token (ej. "ADMIN")
             String rol = jwtUtil.extractRole(token); 
 
-            // Le agregamos el prefijo "ROLE_" porque Spring Security lo exige
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + rol);
+            // 1. Prevención de nulos por si el token viene alterado
+            if (rol == null) {
+                rol = "SIN_ROL";
+            }
+
+            // validacion: solo agrega "ROLE_" si NO lo tiene ya para evitar ROLE_ROLE_ADMIN y cause error
+            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(rol.startsWith("ROLE_") ? rol : "ROLE_" + rol);
 
             // se crea el pase VIP oficial incluyendo la autoridad (rol)
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
