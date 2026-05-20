@@ -5,13 +5,14 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice  //intercepta las excepciones que ocurran en cualquier RestController
 public class GlobalExceptionHandler {
     
-    //aca atrapa el error por si sale RuntimeException, se ejecuta el metodo de abajo
+    //1er flujo: aca atrapa el error por si sale RuntimeException por credenciales e inicios de sesion incorrectos, se ejecuta el metodo de abajo
     @ExceptionHandler(RuntimeException.class)
     //el responseEntity permite controlar tanto el cuerpo del msje y el codigo de estado HTTP
     // se usa un mapa para que Sprin lo convierta en JSON
@@ -25,4 +26,14 @@ public class GlobalExceptionHandler {
     }
 
 
+    //2do flujo: usuarios logeados pero NO tienen permisos
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Acceso denegado (403)");
+        error.put("mensaje", "No tiene autorización para listar usuarios. Solo ADMIN o SUPERVISOR pueden realizar esta acción.");
+
+        // Devuelve un 403 + msje para Postman
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
 }
