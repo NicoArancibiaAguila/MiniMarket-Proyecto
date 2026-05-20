@@ -5,6 +5,7 @@ import com.example.loginauth.repository.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
+    public UsuarioController(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Listar los usuarios solo ADMIN y SUPERVISOR
@@ -40,6 +43,9 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body("Error: El Username ya está en uso.");
         }
         
+        //aca se encripta la contraseña antes de guardar
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        
         Usuario nuevoUsuario = usuarioRepository.save(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
     }
@@ -56,7 +62,10 @@ public class UsuarioController {
 
         Usuario usuario = usuarioExistente.get();
         usuario.setNombre(usuarioActualizado.getNombre());
-        // Nota: En un sistema real, si actualizas la password aquí, debes volver a encriptarla con BCrypt.
+        
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        }
         
         usuarioRepository.save(usuario);
         return ResponseEntity.ok("Usuario actualizado con éxito.");
@@ -73,4 +82,5 @@ public class UsuarioController {
         usuarioRepository.deleteById(id);
         return ResponseEntity.ok("Usuario eliminado con éxito.");
     }
+    
 }
