@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", "Acceso denegado (403)");
-        error.put("mensaje", "No tiene autorización para listar usuarios. Solo ADMIN o SUPERVISOR pueden realizar esta acción.");
+        error.put("mensaje", "No tiene los privilegios suficientes para realizar esta acción. Contacte al administrador del sistema.");
 
         // Devuelve un 403 + msje para Postman
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
