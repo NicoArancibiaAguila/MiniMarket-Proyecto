@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -36,4 +37,16 @@ public class GlobalExceptionHandler {
         // Devuelve un 403 + msje para Postman
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
+
+
+    // 3er Flujo: para errores de Login (Usuario no existe o mala contraseña) ---
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Credenciales inválidas (401)");
+        error.put("mensaje", "Usuario o contraseña incorrectos."); // mensaje generico por ciberseguridad
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
 }
