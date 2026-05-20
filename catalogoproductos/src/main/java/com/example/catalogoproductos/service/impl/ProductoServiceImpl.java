@@ -9,7 +9,7 @@ import com.example.catalogoproductos.dto.ProductoResponseDTO;
 import com.example.catalogoproductos.model.Producto;
 import com.example.catalogoproductos.repository.ProductoRepository; // Asegúrate que esta ruta sea exacta
 import com.example.catalogoproductos.service.ProductoService;
-
+import com.example.catalogoproductos.client.InventarioClient;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final InventarioClient inventarioClient;
 
     @Override
     public ProductoResponseDTO crearProducto(ProductoRequestDTO request) {
@@ -36,7 +37,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         // aca se guarda en la bd
         Producto guardado = productoRepository.save(producto);
-
+        inventarioClient.crearInventario(request);
         // y se retorna
         return mapearADTO(guardado);
     }
