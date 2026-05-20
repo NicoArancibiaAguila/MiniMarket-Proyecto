@@ -6,14 +6,15 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.example.catalogoproductos.dto.ProductoRequestDTO;
 import com.example.catalogoproductos.dto.ProductoResponseDTO;
+import com.example.catalogoproductos.dto.InventarioInitDTO; // Asegúrate de este import
 import com.example.catalogoproductos.model.Producto;
-import com.example.catalogoproductos.repository.ProductoRepository; // Asegúrate que esta ruta sea exacta
+import com.example.catalogoproductos.repository.ProductoRepository;
 import com.example.catalogoproductos.service.ProductoService;
 import com.example.catalogoproductos.client.InventarioClient;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor // Esto inyecta el Repository automáticamente (Lombok)
+@RequiredArgsConstructor
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
@@ -22,23 +23,34 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public ProductoResponseDTO crearProducto(ProductoRequestDTO request) {
 
-        //aca se valida si el SKU ya existe (tiene que ser igual al de inventario si no gg)
+        // 1. Validar si el SKU ya existe en Catálogo
         if (productoRepository.existsBySku(request.getSku())) {
             throw new RuntimeException("Error: Ya existe un producto con el SKU: " + request.getSku());
         }
 
-        // mapear de DTO a entidad
+        // 2. Mapear de DTO a entidad Producto
         Producto producto = new Producto();
         producto.setSku(request.getSku());
         producto.setNombre(request.getNombre());
         producto.setPrecio(request.getPrecio());
         producto.setDescripcion(request.getDescripcion());
         producto.setCategoria(request.getCategoria());
+        producto.setActivo(true); // Se inicializa como activo
 
-        // aca se guarda en la bd
+        // 3. Guardar en la BD de Catálogo
         Producto guardado = productoRepository.save(producto);
-        inventarioClient.crearInventario(request);
-        // y se retorna
+
+        // 4. Traducción: Preparar el objeto que Inventario espera
+        InventarioInitDTO invDto = new InventarioInitDTO();
+        invDto.setSku(guardado.getSku());
+        invDto.setStockActual(0.0);
+        invDto.setNivelCritico(10.0);
+        invDto.setNivelMaximo(100.0);
+
+        // 5. Llamar a Inventario vía Feign (el Interceptor inyectará el token automáticamente)
+        inventarioClient.crearInventario(invDto);
+
+        // 6. Retornar la respuesta
         return mapearADTO(guardado);
     }
 
@@ -64,7 +76,7 @@ public class ProductoServiceImpl implements ProductoService {
         productoRepository.save(producto);
     }
 
-    // metodo auxiliar pra poder transformar entidad -> dto
+    // Método auxiliar para transformar entidad -> dto
     private ProductoResponseDTO mapearADTO(Producto p) {
         ProductoResponseDTO dto = new ProductoResponseDTO();
         dto.setSku(p.getSku());
