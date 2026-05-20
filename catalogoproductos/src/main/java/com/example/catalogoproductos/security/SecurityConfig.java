@@ -4,7 +4,7 @@ import com.example.catalogoproductos.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,27 +13,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor // Esto inyectará el filtro automáticamente
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(authenticationEntryPoint)
+            )
+
             .authorizeHttpRequests(auth -> auth
-                // acceso libre para ver productos
-                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                // proteccion, solo ADMIN puede eliminar o crear
-                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
-                //aca cualquier otra ruta, pide un token basico 
+                // se exige que CUALQUIER persona que intente hacer algo tenga un token valido.
                 .anyRequest().authenticated()
             );
 
-        // aca spring pasa peticiones por el filtro JWT antes del filtro de autenticacion estandar
+        // Acá Spring pasa peticiones por el filtro JWT antes del filtro de autenticación estándar
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
