@@ -32,7 +32,7 @@ public class UsuarioController {
     }
 
     // crear un usuario solo ADMIN
-    @PreAuthorize("hasAuthority('ADMIN', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
         // Validaciones usando los métodos de tu repositorio
@@ -51,7 +51,7 @@ public class UsuarioController {
     }
 
     // actualizar usuario solo ADMIN
-    @PreAuthorize("hasAuthority('ADMIN', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
         Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
@@ -72,7 +72,7 @@ public class UsuarioController {
     }
 
     // eliminar solo ADMIN
-    @PreAuthorize("hasAuthority('ADMIN', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
         if (!usuarioRepository.existsById(id)) {

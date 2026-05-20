@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -47,6 +48,18 @@ public class GlobalExceptionHandler {
         error.put("mensaje", "Usuario o contraseña incorrectos."); // mensaje generico por ciberseguridad
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    // 4to Flujo: para peticiones sin Body o JSON mal formado
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleMessageNotReadable(HttpMessageNotReadableException ex) {
+        Map<String, String> error = new HashMap<>();
+        
+        // Usamos BAD_REQUEST (400) porque el error es de sintaxis del cliente, no de credenciales.
+        error.put("error", "Petición incorrecta (400)"); 
+        error.put("mensaje", "Faltan datos en la petición o el formato es incorrecto. Verifique la información enviada.");
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
 }
