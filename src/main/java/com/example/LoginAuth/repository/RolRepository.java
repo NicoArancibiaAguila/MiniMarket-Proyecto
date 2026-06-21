@@ -4,11 +4,11 @@ package com.example.loginauth.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+
 
 import com.example.loginauth.model.Rol;
 
-@Repository
+
 public interface RolRepository extends JpaRepository<Rol, Long>{
     // extends JpaRepo obtiene los 10 metodos de bd .saveAll findAll etc
     // el <Rol, Long> son dos instrucciones precisas para que funcione, la tabla Rol y busque el tipo de dato Long que es la llave primaria

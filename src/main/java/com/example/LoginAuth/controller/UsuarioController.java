@@ -2,6 +2,9 @@ package com.example.loginauth.controller;
 
 import com.example.loginauth.model.Usuario;
 import com.example.loginauth.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@Tag(name = "Gestión de Usuarios", description = "Endpoints para el CRUD de usuarios. Requieren token JWT en el header.")
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
@@ -23,6 +27,7 @@ public class UsuarioController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(summary = "Obtener todos los usuarios", description = "Retorna una lista con todos los usuarios registrados. Requiere rol ADMIN o SUPERVISOR.")
     // Listar los usuarios solo ADMIN y SUPERVISOR
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'SUPERVISOR', 'ROLE_SUPERVISOR')")
     @GetMapping
@@ -31,18 +36,19 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarios);
     }
 
+    @Operation(summary = "Crear un nuevo usuario", description = "Registra un usuario encriptando su contraseña. Requiere rol ADMIN.")
+    @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente")
+    @ApiResponse(responseCode = "400", description = "RUT o Username ya registrado")
     // crear un usuario solo ADMIN
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
-        // Validaciones usando los métodos de tu repositorio
         if (usuarioRepository.existsByRut(usuario.getRut())) {
             return ResponseEntity.badRequest().body("Error: El RUT ya está registrado.");
         }
         if (usuarioRepository.existsByUsername(usuario.getUsername())) {
             return ResponseEntity.badRequest().body("Error: El Username ya está en uso.");
         }
-        
         //aca se encripta la contraseña antes de guardar
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         
@@ -50,8 +56,11 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
     }
 
-    // actualizar usuario solo ADMIN
+    @Operation(summary = "Actualizar usuario", description = "Modifica los datos de un usuario existente mediante su ID. Requiere rol ADMIN.")
+    @ApiResponse(responseCode = "200", description = "Usuario actualizado con éxito")
+    @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
+    // actualizar usuario solo ADMIN
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
         Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
@@ -71,8 +80,11 @@ public class UsuarioController {
         return ResponseEntity.ok("Usuario actualizado con éxito.");
     }
 
-    // eliminar solo ADMIN
+    @Operation(summary = "Eliminar usuario", description = "Borra físicamente a un usuario de la base de datos por su ID. Requiere rol ADMIN.")
+    @ApiResponse(responseCode = "200", description = "Usuario eliminado con éxito")
+    @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
+    // eliminar solo ADMIN
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
         if (!usuarioRepository.existsById(id)) {
@@ -82,5 +94,5 @@ public class UsuarioController {
         usuarioRepository.deleteById(id);
         return ResponseEntity.ok("Usuario eliminado con éxito.");
     }
-    
 }
+

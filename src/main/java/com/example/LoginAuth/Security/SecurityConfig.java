@@ -35,7 +35,12 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable()) // Deshabilitamos CSRF para APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Permitimos login sin token
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html"
+                ).permitAll() // Permitimos login sin token y la interfaz de Swagger
                 .anyRequest().authenticated() // Lo demás requiere token
             )
             .sessionManagement(session -> session
@@ -53,7 +58,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-@Bean
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         // recibir el usuario, buscar en la bd y compararlo
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);

@@ -1,6 +1,8 @@
 package com.example.loginauth.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -43,6 +45,7 @@ public class Usuario {
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)  //fetch hace que Hibernate busque un usuario en bd y se traiga la info
