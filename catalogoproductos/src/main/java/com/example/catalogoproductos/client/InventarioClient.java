@@ -1,6 +1,6 @@
 package com.example.catalogoproductos.client;
 
-import com.example.catalogoproductos.dto.InventarioInitDTO; // 🔥 Usaremos este nuevo DTO
+import com.example.catalogoproductos.dto.InventarioInitDTO; //  Usaremos este nuevo DTO
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface InventarioClient {
 
         @PostMapping("/api/inventario/crear")
-        Object crearInventario(@RequestBody InventarioInitDTO dto); // 🔥 Cambiamos el DTO
+        Object crearInventario(@RequestBody InventarioInitDTO dto); //  Cambiamos el DTO
 }

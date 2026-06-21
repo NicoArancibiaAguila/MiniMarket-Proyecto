@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor // Esto inyectará el filtro automáticamente
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -28,16 +28,19 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(authenticationEntryPoint)
             )
-
             .authorizeHttpRequests(auth -> auth
-                // se exige que CUALQUIER persona que intente hacer algo tenga un token valido.
+                //  Permitimos solo las rutas de la documentación de Swagger
+                .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+                // Todo el resto de la API requiere token
                 .anyRequest().authenticated()
             );
 
-        // Acá Spring pasa peticiones por el filtro JWT antes del filtro de autenticación estándar
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }
