@@ -39,10 +39,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
+=======
+
+>>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -136,6 +140,7 @@
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
@@ -152,6 +157,8 @@
             <scope>test</scope>
         </dependency>
 
+=======
+>>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
     </dependencies>
 
     <dependencyManagement>
