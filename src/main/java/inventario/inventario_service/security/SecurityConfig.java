@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
                 .authorizeHttpRequests(auth -> auth
-<<<<<<< HEAD
+
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -43,9 +43,7 @@ public class SecurityConfig {
                         ).permitAll()
                         
                         //  REGLA GLOBAL UNIFICADA: 
-=======
                         // 🔥 REGLA GLOBAL UNIFICADA: 
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
                         // CUALQUIER petición exige token válido.
                         .anyRequest().authenticated()
                 );

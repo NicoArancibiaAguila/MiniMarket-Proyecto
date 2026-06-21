@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize; 
 import org.springframework.web.bind.annotation.*;
-<<<<<<< HEAD
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,11 +23,8 @@ import java.util.List;
     name = "Inventario",
     description = "Gestión de stock y control de inventario de productos"
 )
-=======
 
-import java.util.List;
 
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
 @RestController
 @RequestMapping("/api/inventario")
 public class InventarioController {
@@ -37,7 +34,7 @@ public class InventarioController {
 
     // --- NUEVO ENDPOINT: Listar todo el inventario ---
     // Accesible para cualquier rol autenticado
-<<<<<<< HEAD
+
     @Operation(
     summary = "Listar inventario",
     description = "Obtiene todos los registros de inventario disponibles"
@@ -46,15 +43,14 @@ public class InventarioController {
         @ApiResponse(responseCode = "200", description = "Inventario obtenido correctamente"),
         @ApiResponse(responseCode = "401", description = "No autorizado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
     @GetMapping
     public ResponseEntity<List<StockResponseDTO>> listarTodo() {
         return ResponseEntity.ok(service.obtenerTodos());
     }
 
     // Crear producto: Solo ADMIN y SUPERVISOR
-<<<<<<< HEAD
+
     @Operation(
     summary = "Crear inventario",
     description = "Crea un nuevo registro de inventario para un producto existente"
@@ -64,8 +60,8 @@ public class InventarioController {
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
         @ApiResponse(responseCode = "401", description = "No autorizado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
+
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'SUPERVISOR', 'ROLE_SUPERVISOR')")
     @PostMapping("/crear")
     public ResponseEntity<StockResponseDTO> crearProducto(
@@ -74,7 +70,7 @@ public class InventarioController {
     }
 
     // Aumentar stock manual: Solo ADMIN y SUPERVISOR
-<<<<<<< HEAD
+
     @Operation(
     summary = "Aumentar stock",
     description = "Incrementa la cantidad disponible de un producto"
@@ -84,8 +80,7 @@ public class InventarioController {
         @ApiResponse(responseCode = "401", description = "No autorizado"),
         @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'SUPERVISOR', 'ROLE_SUPERVISOR')")
     @PutMapping("/aumentar")
     public ResponseEntity<StockResponseDTO> aumentarStock(
@@ -94,7 +89,7 @@ public class InventarioController {
     }
 
     // Disminuir stock manual: Solo ADMIN y SUPERVISOR
-<<<<<<< HEAD
+
     @Operation(
     summary = "Disminuir stock",
     description = "Disminuye la cantidad disponible de un producto"
@@ -104,8 +99,7 @@ public class InventarioController {
         @ApiResponse(responseCode = "401", description = "No autorizado"),
         @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'SUPERVISOR', 'ROLE_SUPERVISOR')")
     @PutMapping("/disminuir")
     public ResponseEntity<StockResponseDTO> disminuirStock(
@@ -114,7 +108,7 @@ public class InventarioController {
     }
 
     // Buscar por SKU: Cualquier rol autenticado (Cajero, Panadero, Admin, Supervisor)
-<<<<<<< HEAD
+
     @Operation(
     summary = "Buscar producto por SKU",
     description = "Obtiene la información de inventario asociada a un SKU específico"
@@ -124,15 +118,14 @@ public class InventarioController {
         @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
         @ApiResponse(responseCode = "401", description = "No autorizado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
     @GetMapping("/{sku}")
     public ResponseEntity<StockResponseDTO> obtenerPorSku(@PathVariable String sku) {
         return ResponseEntity.ok(service.obtenerPorSku(sku));
     }
 
     // Stock crítico: Cualquier rol autenticado necesita ver alertas
-<<<<<<< HEAD
+
     @Operation(
     summary = "Consultar stock crítico",
     description = "Obtiene los productos con stock bajo el mínimo permitido"
@@ -141,15 +134,14 @@ public class InventarioController {
         @ApiResponse(responseCode = "200", description = "Inventario obtenido correctamente"),
         @ApiResponse(responseCode = "401", description = "No autorizado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
     @GetMapping("/critico")
     public ResponseEntity<List<StockResponseDTO>> obtenerStockCritico() {
         return ResponseEntity.ok(service.obtenerStockCritico());
     }
 
     // Sumar stock desde producción: Permitir a ADMIN, SUPERVISOR y al proceso automático
-<<<<<<< HEAD
+
     @Operation(
     summary = "Sumar stock desde producción",
     description = "Incrementa automáticamente el stock al registrar un lote de producción"
@@ -159,8 +151,7 @@ public class InventarioController {
         @ApiResponse(responseCode = "401", description = "No autorizado"),
         @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
-=======
->>>>>>> 8168747ee02dc4f1ce3d85085fc298dd248c9bf4
+
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'SUPERVISOR', 'ROLE_SUPERVISOR', 'PRODUCCION')")
     @PutMapping("/sumar-stock/{sku}/{cantidad}")
     public ResponseEntity<String> sumarStock(
