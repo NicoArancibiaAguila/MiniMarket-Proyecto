@@ -76,9 +76,17 @@ public class ProductoServiceImpl implements ProductoService {
         productoRepository.save(producto);
     }
 
+    @Override
+    public ProductoResponseDTO obtenerPorId(Long id) {
+        Producto producto = productoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        return mapearADTO(producto);
+    }
+
     // Método auxiliar para transformar entidad -> dto
     private ProductoResponseDTO mapearADTO(Producto p) {
         ProductoResponseDTO dto = new ProductoResponseDTO();
+        dto.setId(p.getId()); 
         dto.setSku(p.getSku());
         dto.setNombre(p.getNombre());
         dto.setPrecio(p.getPrecio());

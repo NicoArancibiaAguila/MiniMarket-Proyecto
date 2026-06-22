@@ -50,6 +50,15 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.obtenerPorSku(sku));
     }
 
+    @Operation(summary = "Buscar producto por ID", description = "Busca los detalles de un producto mediante su ID numérico.")
+    @ApiResponse(responseCode = "200", description = "Producto encontrado")
+    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable Long id) {
+        // Aquí asumo que en tu servicio tienes un método llamado obtenerPorId(id)
+        return ResponseEntity.ok(productoService.obtenerPorId(id));
+    }
+
     @Operation(summary = "Desactivar producto (Borrado Lógico)", description = "Pausa las ventas de un producto sin eliminarlo de la base de datos. Requiere rol ADMIN o SUPERVISOR.")
     @ApiResponse(responseCode = "204", description = "Producto desactivado con éxito")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'SUPERVISOR', 'ROLE_SUPERVISOR')")

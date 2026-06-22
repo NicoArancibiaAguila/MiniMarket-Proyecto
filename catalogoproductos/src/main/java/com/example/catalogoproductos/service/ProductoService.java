@@ -13,6 +13,8 @@ public interface ProductoService {
     
     // Para que ventas/inventario nos pregunten por un SKU específico
     ProductoResponseDTO obtenerPorSku(String sku);
+
+    ProductoResponseDTO obtenerPorId(Long id);
     
     // soft delete, se desactiva en lugar de borrar
     void desactivarProducto(String sku);

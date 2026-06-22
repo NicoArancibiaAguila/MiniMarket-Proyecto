@@ -14,6 +14,7 @@ public class ProductoModelAssembler implements RepresentationModelAssembler<Prod
     @Override
     public EntityModel<ProductoResponseDTO> toModel(Producto producto) {
         ProductoResponseDTO dto = new ProductoResponseDTO();
+        dto.setId(producto.getId()); 
         dto.setSku(producto.getSku());
         dto.setNombre(producto.getNombre());
         dto.setDescripcion(producto.getDescripcion());

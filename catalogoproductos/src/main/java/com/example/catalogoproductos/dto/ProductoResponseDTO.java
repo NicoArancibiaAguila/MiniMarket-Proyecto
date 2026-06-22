@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 @Schema(description = "Datos de respuesta del producto")
 public class ProductoResponseDTO {
+    @Schema(example = "1")
+    private Long id;           // agregar este campo
     @Schema(example = "PAN-004")
     private String sku;
     @Schema(example = "Pan Amasado")
