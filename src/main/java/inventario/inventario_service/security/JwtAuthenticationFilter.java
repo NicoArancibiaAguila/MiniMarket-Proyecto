@@ -1,5 +1,6 @@
 package inventario.inventario_service.security;
 
+import inventario.inventario_service.security.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,20 +38,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         if (jwtUtil.isTokenValid(token)) {
-
             String username = jwtUtil.extractUsername(token);
             String rol = jwtUtil.extractRole(token);
 
-            // Si el rol ya trae "ROLE", no se lo agregamos de nuevo
-            String authorityName = rol.startsWith("ROLE") ? rol : "ROLE_" + rol;
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(authorityName);
+            if (rol == null) rol = "SIN_ROL";
 
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            Collections.singletonList(authority)
-                    );
+            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
+                rol.startsWith("ROLE_") ? rol : "ROLE_" + rol
+            );
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    username, null, Collections.singletonList(authority)
+            );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
