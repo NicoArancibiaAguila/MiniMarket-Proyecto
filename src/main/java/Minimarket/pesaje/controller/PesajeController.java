@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RestController
 @RequestMapping("/api/pesajes")
 @RequiredArgsConstructor
-@Tag(name = "Pesaje de Productos", description = "Endpoints para el registro y consulta de pesajes. HATEOAS habilitado.")
+@Tag(name = "Pesaje de Productos", description = "Endpoints para el registro y consulta de pesajes.")
 @SecurityRequirement(name = "bearerAuth")
 public class PesajeController {
 
@@ -31,7 +30,7 @@ public class PesajeController {
     private final PesajeModelAssembler assembler;
 
     @Operation(summary = "Registrar un nuevo pesaje")
-    @ApiResponse(responseCode = "201", description = "Creado")
+    @ApiResponse(responseCode = "201", description = "Pesaje creado correctamente")
     @PostMapping
     public ResponseEntity<PesajeResponseDTO> crearPesaje(@Valid @RequestBody PesajeRequestDTO pesajeRequestDTO) {
         PesajeResponseDTO nuevoPesaje = pesajeService.guardarPesaje(pesajeRequestDTO);
@@ -39,17 +38,18 @@ public class PesajeController {
     }
 
     @Operation(summary = "Listar todos los pesajes")
+    @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
     @GetMapping
-    public ResponseEntity<CollectionModel<PesajeResponseDTO>> listarPesajes() {
+    public ResponseEntity<List<PesajeResponseDTO>> listarPesajes() {
         List<PesajeResponseDTO> pesajes = pesajeService.obtenerTodos().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(CollectionModel.of(pesajes, 
-                linkTo(methodOn(PesajeController.class).listarPesajes()).withSelfRel()));
+        return ResponseEntity.ok(pesajes);
     }
 
     @Operation(summary = "Buscar pesaje por ID")
+    @ApiResponse(responseCode = "200", description = "Pesaje encontrado")
+    @ApiResponse(responseCode = "404", description = "Pesaje no encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<PesajeResponseDTO> obtenerPesajePorId(@PathVariable("id") Long id) {
         PesajeResponseDTO dto = pesajeService.obtenerPorId(id);
