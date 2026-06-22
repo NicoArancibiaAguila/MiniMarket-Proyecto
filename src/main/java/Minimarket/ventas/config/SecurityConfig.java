@@ -31,7 +31,14 @@ public class SecurityConfig {
             
             // Configura las políticas de acceso a las URLs
             .authorizeHttpRequests(auth -> auth
-                // Cualquier petición HTTP requerirá obligatoriamente que el usuario esté autenticado
+                // ¡AQUÍ ESTÁ EL CAMBIO!: Permitimos el acceso libre a la documentación de Swagger
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+                
+                // Cualquier otra petición HTTP requerirá obligatoriamente que el usuario esté autenticado
                 .anyRequest().authenticated()
             )
             
