@@ -15,39 +15,36 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initDatabase(UsuarioRepository usuarioRepository, RolRepository rolRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            
-            // 🔥 EL BOTÓN DE RESET: Borra todos los usuarios actuales
-            usuarioRepository.deleteAll();
-            System.out.println("Base de datos de usuarios limpiada. Restaurando valores por defecto...");
-            
-            // crear Roles si no existen en la base de datos
+
+            if (usuarioRepository.count() > 0) {
+                System.out.println("Base de datos de usuarios ya tiene datos, omitiendo inicialización.");
+                return;
+            }
+
+            System.out.println("Base de datos vacía. Cargando usuarios y roles por defecto...");
+
             Rol rolAdmin = crearRolSiNoExiste(rolRepository, "ADMIN");
             Rol rolSupervisor = crearRolSiNoExiste(rolRepository, "SUPERVISOR");
             Rol rolCajero = crearRolSiNoExiste(rolRepository, "CAJERO");
             Rol rolPanadero = crearRolSiNoExiste(rolRepository, "PANADERO");
 
-            // Admin, dios mismo
             crearUsuario(usuarioRepository, passwordEncoder, "admin", "admin123", rolAdmin, "Hernan Saavedra", "15234678-5");
 
-            // Supervisores, angeles
             crearUsuario(usuarioRepository, passwordEncoder, "super1", "super123", rolSupervisor, "Romina Sanchez", "17345567-2");
             crearUsuario(usuarioRepository, passwordEncoder, "super2", "super123", rolSupervisor, "Dennis Fraser", "18236567-4");
 
-            // Cajeros, simples mortales
             crearUsuario(usuarioRepository, passwordEncoder, "cajero1", "cajero123", rolCajero, "Benjamin Gonzalez", "19567789-3");
             crearUsuario(usuarioRepository, passwordEncoder, "cajero2", "cajero123", rolCajero, "Nicolas Arancibia", "19234456-2");
 
-            // Panaderos, mortales de elite, indispensables
             crearUsuario(usuarioRepository, passwordEncoder, "panadero1", "panadero123", rolPanadero, "Juan Perez", "12323434-5");
             crearUsuario(usuarioRepository, passwordEncoder, "panadero2", "panadero123", rolPanadero, "Cristiano Ronaldo", "14234566-3");
             crearUsuario(usuarioRepository, passwordEncoder, "panadero3", "panadero123", rolPanadero, "Leo Messi", "16237485-2");
             crearUsuario(usuarioRepository, passwordEncoder, "panadero4", "panadero123", rolPanadero, "Alexis Sanchez", "17234567-4");
 
-            System.out.println("Los 9 usuarios iniciales fueron restaurados con éxito");
+            System.out.println("Los 9 usuarios iniciales fueron cargados con éxito.");
         };
     }
 
-    // metodos aux para no repetir código 
     private Rol crearRolSiNoExiste(RolRepository repository, String nombreRol) {
         return repository.findByNombreRol(nombreRol).orElseGet(() -> {
             Rol nuevoRol = new Rol();
@@ -57,11 +54,12 @@ public class DataInitializer {
     }
 
     private void crearUsuario(UsuarioRepository repo, PasswordEncoder encoder, String username, String password, Rol rol, String nombre, String rut) {
+        if (repo.existsByUsername(username)) return;
         Usuario usuario = new Usuario();
         usuario.setUsername(username);
-        usuario.setPassword(encoder.encode(password)); // ¡Aquí se encripta!
+        usuario.setPassword(encoder.encode(password));
         usuario.setRol(rol);
-        usuario.setNombre(nombre); 
+        usuario.setNombre(nombre);
         usuario.setRut(rut);
         repo.save(usuario);
     }
