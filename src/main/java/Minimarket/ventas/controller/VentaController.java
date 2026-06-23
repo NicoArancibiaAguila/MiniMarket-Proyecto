@@ -1,7 +1,7 @@
 package Minimarket.ventas.controller;
 
 import Minimarket.ventas.dto.VentaRequestDTO;
-import Minimarket.ventas.model.Venta;
+import Minimarket.ventas.dto.VentaResponseDTO; // NUEVO IMPORTE
 import Minimarket.ventas.service.VentaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,7 +26,7 @@ public class VentaController {
 
     @Operation(summary = "Listar todas las ventas", description = "Obtiene el historial completo de todas las ventas registradas en el sistema")
     @GetMapping
-    public ResponseEntity<List<Venta>> listarTodas() {
+    public ResponseEntity<List<VentaResponseDTO>> listarTodas() {
         return ResponseEntity.ok(ventaService.listarTodas());
     }
 
@@ -37,8 +37,8 @@ public class VentaController {
         @ApiResponse(responseCode = "404", description = "Producto o ticket de pesaje no encontrado")
     })
     @PostMapping
-    public ResponseEntity<Venta> registrarPedido(@Valid @RequestBody VentaRequestDTO ventaRequestDTO) {
-        Venta nuevoPedido = ventaService.crearPedido(ventaRequestDTO);
+    public ResponseEntity<VentaResponseDTO> registrarPedido(@Valid @RequestBody VentaRequestDTO ventaRequestDTO) {
+        VentaResponseDTO nuevoPedido = ventaService.crearPedido(ventaRequestDTO);
         return new ResponseEntity<>(nuevoPedido, HttpStatus.CREATED);
     }
 
@@ -48,10 +48,10 @@ public class VentaController {
         @ApiResponse(responseCode = "404", description = "Venta no encontrada")
     })
     @PutMapping("/{id}/confirmar")
-    public ResponseEntity<Venta> confirmarPago(
+    public ResponseEntity<VentaResponseDTO> confirmarPago(
             @Parameter(description = "ID numérico de la venta a confirmar", example = "1") 
             @PathVariable("id") Long id) {
-        Venta ventaPagada = ventaService.confirmarPago(id);
+        VentaResponseDTO ventaPagada = ventaService.confirmarPago(id);
         return ResponseEntity.ok(ventaPagada);
     }
 }
